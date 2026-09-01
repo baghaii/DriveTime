@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">DriveTime</string>
+    <string name="no_drives_logged">No drives logged</string>
+    <string name="lets_get_driving">Let\'s get going</string>
+    <string name="day_hours">Day Hours: %1$.2f</string>"
+    <string name="night_hours">Night Hours: %1$.2f</string>"
+    <plurals name="hours">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+</resources>

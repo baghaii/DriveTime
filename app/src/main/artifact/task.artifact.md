@@ -1,0 +1,3 @@
+- [ ] Clean up `Type.kt` and add `bodyLargeEmphasized` extension property.
+- [ ] Verify build.
+- [ ] Verify UI appearance.
