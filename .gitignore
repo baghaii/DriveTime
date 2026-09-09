@@ -49,4 +49,4 @@ google-services.json
 .externalNativeBuild
 .cxx
 local.properties
->>>>>>> 611c94c (First commit)
+.artifacts

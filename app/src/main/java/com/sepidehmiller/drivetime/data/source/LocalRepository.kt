@@ -8,4 +8,5 @@ interface LocalRepository {
     fun observeDriveTimes(): Flow<List<LocalDriveTime>>
 
     fun observeDriveTime(id: Int): Flow<LocalDriveTime>
+    suspend fun deleteDriveTime(id: Int)
 }

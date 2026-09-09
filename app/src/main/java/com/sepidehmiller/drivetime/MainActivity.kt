@@ -43,7 +43,8 @@ class MainActivity : ComponentActivity() {
                         })
                     ) {
                         DriveLogDetailScreen(
-                            onBack = { navController.popBackStack() }
+                            onBack = { navController.popBackStack() },
+                            onDelete = { navController.popBackStack() }
                         )
                     }
                     composable(NavDestinations.DRIVE_LOG_INPUT_ROUTE) {

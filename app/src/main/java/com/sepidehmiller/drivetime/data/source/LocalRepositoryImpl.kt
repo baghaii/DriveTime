@@ -4,6 +4,7 @@ import com.sepidehmiller.drivetime.data.source.local.DriveTimeDao
 import com.sepidehmiller.drivetime.data.source.local.LocalDriveTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -22,5 +23,17 @@ class LocalRepositoryImpl @Inject constructor(
 
     override fun observeDriveTime(id: Int): Flow<LocalDriveTime> {
         return localDataSource.observeDriveTime(id)
+            .transformWhile { driveTime ->
+                if (driveTime != null) {
+                    emit(driveTime)
+                    true
+                } else {
+                    false
+                }
+            }
+    }
+
+    override suspend fun deleteDriveTime(id: Int) {
+        localDataSource.deleteDriveTime(id)
     }
 }
