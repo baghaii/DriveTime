@@ -11,7 +11,7 @@ interface DriveTimeDao {
     fun observeDriveTimes(): Flow<List<LocalDriveTime>>
 
     @Query("SELECT * FROM drive_time WHERE id = :id")
-    fun observeDriveTime(id: Int): Flow<LocalDriveTime>
+    fun observeDriveTime(id: Int): Flow<LocalDriveTime?>
 
     @Upsert
     suspend fun upsertDriveTime(driveTime: LocalDriveTime)
