@@ -1,0 +1,32 @@
+reproducible-build:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v6
+
+    - name: Cache Gradle Docker dependencies
+      uses: actions/cache@v5
+      with:
+        path: ~/.gradle-docker
+        key: gradle-docker-${{ hashFiles('gradle/libs.versions.toml', 'app/build.gradle.kts', 'build.gradle.kts') }}
+        restore-keys: gradle-docker-
+
+    - name: First build
+      run: bash docker-build.sh
+
+    - name: Save first build artifact
+      run: cp app/build/outputs/apk/foss/release/app-foss-release-unsigned.apk /tmp/build1.apk
+
+    - name: Second build
+      run: bash docker-build.sh
+
+    - name: Compare build hashes
+      run: |
+        h1=$(sha256sum /tmp/build1.apk | cut -d' ' -f1)
+        h2=$(sha256sum app/build/outputs/apk/foss/release/app-foss-release-unsigned.apk | cut -d' ' -f1)
+        echo "Build 1: $h1"
+        echo "Build 2: $h2"
+        if [ "$h1" != "$h2" ]; then
+          echo "::error::Build is not reproducible — two clean builds of the same commit produced different output."
+          exit 1
+        fi
+        echo "Build is reproducible."

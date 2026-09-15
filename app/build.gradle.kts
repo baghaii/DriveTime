@@ -1,9 +1,16 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
+}
+
+val localProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) load(f.inputStream())
 }
 
 android {
@@ -20,6 +27,20 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    flavorDimensions += "store"
+
+    productFlavors {
+        create("foss") {
+            dimension = "store"
+        }
+        create("play") {
+            dimension = "store"
+            if (localProps["storeFile"] != null) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+        }
+    }
+
     buildTypes {
         release {
             optimization {
@@ -33,6 +54,12 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+}
+
+tasks.configureEach {
+    if ( name.contains("ArtProfile") && !name.contains("Play") ) {
+            enabled = false
     }
 }
 
