@@ -115,7 +115,7 @@ platform :android do
     UI.user_error!("Missing storePassword/keyPassword in local.properties") unless store_pass && key_pass
 
     keystore = local_props[/storeFile=(.+)/, 1]&.strip
-    keystore = File.join(project_dir, "release/c2k-release.jks") unless keystore && File.exist?(keystore)
+    keystore = File.join(project_dir, "release/driveTime-release.jks") unless keystore && File.exist?(keystore)
     UI.user_error!("Signing keystore not found at #{keystore}") unless File.exist?(keystore)
 
     unsigned_apk = File.join(project_dir, "app/build/outputs/apk/foss/release/app-foss-release-unsigned.apk")
@@ -131,7 +131,7 @@ platform :android do
     # Passwords can contain shell metacharacters — escape everything interpolated.
     sh(
       "#{apksigner.shellescape} sign " \
-      "--ks #{keystore.shellescape} --ks-key-alias c2k " \
+      "--ks #{keystore.shellescape} --ks-key-alias driveTime " \
       "--ks-pass pass:#{store_pass.shellescape} --key-pass pass:#{key_pass.shellescape} " \
       "--out #{signed_apk.shellescape} #{unsigned_apk.shellescape}",
       log: false
@@ -152,6 +152,6 @@ platform :android do
 
     sh("gh release create #{tag.shellescape} #{release_apk.shellescape} --title #{tag.shellescape} --notes #{body.shellescape}")
 
-    UI.success("Released #{tag}: https://github.com/AnalogGhost/c2k/releases/tag/#{tag}")
+    UI.success("Released #{tag}: https://github.com/baghaii/DriveTime/releases/tag/#{tag}")
   end
 end
