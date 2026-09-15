@@ -1,0 +1,108 @@
+fastlane documentation
+----
+
+# Installation
+
+Make sure you have the latest version of the Xcode command line tools installed:
+
+```sh
+xcode-select --install
+```
+
+For _fastlane_ installation instructions, see [Installing _fastlane_](https://docs.fastlane.tools/#installing-fastlane)
+
+# Available Actions
+
+## Android
+
+### android screenshots
+
+```sh
+[bundle exec] fastlane android screenshots
+```
+
+Build the debug APK + test APK, capture raw store-listing screenshots in every locale
+
+(into fastlane/metadata/android — F-Droid's plain set), then composite the framed/
+
+captioned marketing set (into fastlane/metadata/android-play) for Play Store upload.
+
+### android playstore
+
+```sh
+[bundle exec] fastlane android playstore
+```
+
+Build the Play release AAB and upload it plus store listing metadata to Google Play
+
+Defaults to a dry run (validate_only) against the internal track — pass track:production
+
+and validate_only:false to actually publish.
+
+### android metadata
+
+```sh
+[bundle exec] fastlane android metadata
+```
+
+Upload only the store-listing text (titles/descriptions) to Google Play — no build,
+
+no AAB, no images, no changelogs. For listing-copy fixes between releases.
+
+Defaults to a dry run; pass validate_only:false to publish.
+
+### android images
+
+```sh
+[bundle exec] fastlane android images
+```
+
+Upload only store screenshots/images to Google Play — no build, no AAB, no listing
+
+text, no changelogs. For refreshed screenshots between releases.
+
+Reads from fastlane/metadata/android-play, the framed/captioned marketing set generated
+
+by `./gradlew :tools:screenshot-composer:run` — NOT fastlane/metadata/android, which
+
+stays plain/raw for F-Droid.
+
+Defaults to a dry run; pass validate_only:false to publish.
+
+### android changelogs
+
+```sh
+[bundle exec] fastlane android changelogs
+```
+
+Upload only changelogs (release notes) to Google Play — no build, no AAB, no images,
+
+no listing text. For fixing or adding a missed changelog translation after a release.
+
+Requires version_code (the release this changelog belongs to).
+
+Defaults to a dry run; pass validate_only:false to publish.
+
+### android release
+
+```sh
+[bundle exec] fastlane android release
+```
+
+Tag, reproducibly build, sign, and publish a GitHub release for F-Droid.
+
+Run this only after the version bump + changelog commit is already made and pushed-
+
+worthy — see project release checklist. Pauses for confirmation before anything public
+
+(push, GitHub release) happens; the docker build and signing run first so you can see
+
+the real SHA-256 before deciding.
+
+----
+
+This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.
+
+More information about _fastlane_ can be found on [fastlane.tools](https://fastlane.tools).
+
+The documentation of _fastlane_ can be found on [docs.fastlane.tools](https://docs.fastlane.tools).

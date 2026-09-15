@@ -50,3 +50,12 @@ google-services.json
 .cxx
 local.properties
 .artifacts
+
+# fastlane run artifacts — not the config files themselves
+fastlane/report.xml
+fastlane/metadata/android/screenshots.html
+vendor/bundle/
+
+# Local machine paths to secrets — never commit
+fastlane/.env.default
+fastlane/.env
