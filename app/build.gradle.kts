@@ -17,6 +17,15 @@ android {
     namespace = "com.sepidehmiller.drivetime"
     compileSdk = 37
 
+    signingConfigs {
+        create("release") {
+            storeFile = localProps["storeFile"]?.let { file(it.toString()) }
+            storePassword = localProps["storePassword"]?.toString()
+            keyAlias = localProps["keyAlias"]?.toString()
+            keyPassword = localProps["keyPassword"]?.toString()
+        }
+    }
+
     defaultConfig {
         applicationId = "com.sepidehmiller.drivetime"
         minSdk = 28

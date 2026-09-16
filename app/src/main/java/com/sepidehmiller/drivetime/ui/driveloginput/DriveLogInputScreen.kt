@@ -26,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -71,7 +72,12 @@ fun DriveLogInputScreen(
         ) {
             var showPicker by remember { mutableStateOf(false) }
             val datePickerState = rememberDatePickerState(
-                initialSelectedDateMillis = Instant.now().toEpochMilli()
+                initialSelectedDateMillis = Instant.now().toEpochMilli(),
+                selectableDates = object : SelectableDates {
+                    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                        return utcTimeMillis <= Instant.now().toEpochMilli()
+                    }
+                }
             )
             val dateTextFieldState = rememberTextFieldState(
                 initialText = AppDateFormatter.formatMillis(Instant.now().toEpochMilli())
