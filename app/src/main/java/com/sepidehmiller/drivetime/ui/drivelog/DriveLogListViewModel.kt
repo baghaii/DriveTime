@@ -6,33 +6,49 @@ import com.sepidehmiller.drivetime.data.source.DriveTimeUi
 import com.sepidehmiller.drivetime.data.source.LocalRepository
 import com.sepidehmiller.drivetime.data.source.toDriveTimeUi
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
 class DriveLogListViewModel @Inject constructor(localRepository: LocalRepository): ViewModel() {
 
-    val driveTimes: SharedFlow<DriveTimeState> =
+    val driveTimes: StateFlow<DriveTimeState> =
         localRepository.observeDriveTimes().map { driveTimes ->
             if (driveTimes.isEmpty()) {
                 DriveTimeState.Empty
             } else {
-                DriveTimeState.Loaded(driveTimes.map{it.toDriveTimeUi()})
+                val uiDriveTimes = driveTimes.map { it.toDriveTimeUi() }
+                val (daySum, nightSum) = calculateHoursTotals(uiDriveTimes)
+                DriveTimeState.Loaded(
+                    driveTimes = uiDriveTimes,
+                    daySum = daySum,
+                    nightSum = nightSum
+                )
             }
-        }.shareIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                replay = 1
-            )
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = DriveTimeState.Loading
+        )
 }
 
-private fun totalHours(driveHours: List<Double>, driveMinutes: List<Double>): Double {
-    val hours = driveHours.sum()
-    val minutes = driveMinutes.sum()
-    return hours + minutes / 60.0
+fun calculateHoursTotals(driveTimes: List<DriveTimeUi>): Pair<Double, Double> {
+    var dayMinutesTotal = 0.0
+    var nightMinutesTotal = 0.0
+
+    for (item in driveTimes) {
+        val dayH = item.dayHours.toDoubleOrNull() ?: 0.0
+        val dayM = item.dayMinutes.toDoubleOrNull() ?: 0.0
+        dayMinutesTotal += dayH * 60 + dayM
+
+        val nightH = item.nightHours.toDoubleOrNull() ?: 0.0
+        val nightM = item.nightMinutes.toDoubleOrNull() ?: 0.0
+        nightMinutesTotal += nightH * 60 + nightM
+    }
+    return Pair(dayMinutesTotal / 60.0, nightMinutesTotal / 60.0)
 }
 
 sealed class DriveTimeState {
@@ -40,12 +56,7 @@ sealed class DriveTimeState {
     object Empty: DriveTimeState()
     data class Loaded(
         val driveTimes: List<DriveTimeUi>,
-        val daySum: Double = totalHours(
-            driveHours = driveTimes.map{ it.dayHours.toDouble() },
-            driveMinutes = driveTimes.map{ it.dayMinutes.toDouble()}),
-        val nightSum: Double = totalHours(
-            driveHours = driveTimes.map{ it.nightHours.toDouble() },
-            driveMinutes = driveTimes.map{ it.nightMinutes.toDouble()}
-        )
+        val daySum: Double,
+        val nightSum: Double
     ): DriveTimeState()
 }

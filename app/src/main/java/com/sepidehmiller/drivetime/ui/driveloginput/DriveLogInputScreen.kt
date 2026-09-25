@@ -171,13 +171,14 @@ fun DriveLogInputScreen(
                     )
                     .padding(8.dp)
             )
+            val someTime = listOf(dayTimeHoursTextFieldState.text, dayTimeMinutesTextFieldState.text, nightTimeHoursTextFieldState.text, nightTimeMinutesTextFieldState.text).any{it.isNotEmpty()}
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 modifier = Modifier.align(Alignment.End),
-                enabled = (dayTimeHoursTextFieldState.text.isDigitsOnly() || dayTimeHoursTextFieldState.text.isEmpty()) &&
+                enabled = someTime && ((dayTimeHoursTextFieldState.text.isDigitsOnly() || dayTimeHoursTextFieldState.text.isEmpty()) &&
                         (dayTimeMinutesTextFieldState.text.isDigitsOnly() || dayTimeMinutesTextFieldState.text.isEmpty()) &&
                         (nightTimeHoursTextFieldState.text.isDigitsOnly() || nightTimeHoursTextFieldState.text.isEmpty()) &&
-                        (nightTimeMinutesTextFieldState.text.isDigitsOnly() || nightTimeMinutesTextFieldState.text.isEmpty()),
+                        (nightTimeMinutesTextFieldState.text.isDigitsOnly() || nightTimeMinutesTextFieldState.text.isEmpty())),
                 onClick = {
                     viewModel.addDriveLog(
                         dateString = dateTextFieldState.text.toString(),
