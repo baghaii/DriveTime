@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
@@ -23,6 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -44,7 +46,7 @@ fun DriveLogScreen(
     seeDetailsAction: (id: Int) -> Unit,
     fabAction: () -> Unit
 ) {
-    val state by viewModel.driveTimes.collectAsStateWithLifecycle(DriveTimeState.Loading)
+    val state by viewModel.driveTimes.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -97,17 +99,17 @@ fun DriveLogList(
     LazyColumn(modifier = modifier.padding(16.dp)) {
         item {
             Spacer(modifier = Modifier.height(16.dp))
-            DriveTimeWithIcon(icon = R.drawable.sun, text = stringResource(R.string.day_hours, driveTimeState.daySum))
+            DriveTimeSummaryWithIcon(icon = R.drawable.sun, text = stringResource(R.string.day_hours, driveTimeState.daySum))
             Spacer(modifier = Modifier.height(8.dp))
-            DriveTimeWithIcon(icon = R.drawable.moon, text = stringResource(R.string.night_hours, driveTimeState.nightSum))
+            DriveTimeSummaryWithIcon(icon = R.drawable.moon, text = stringResource(R.string.night_hours, driveTimeState.nightSum))
             Spacer(modifier = Modifier.height(16.dp))
         }
-        items(driveTimeState.driveTimes.size) { index ->
-            if (index > 0) {
+        items(items = driveTimeState.driveTimes, key = { it.id }) { driveTime ->
+            if (driveTimeState.driveTimes[0] != driveTime) {
                 Spacer(modifier = Modifier.height(16.dp))
             }
             DriveLogListItem(
-                driveTime = driveTimeState.driveTimes[index],
+                driveTime = driveTime,
                 seeDetailsAction = seeDetailsAction
             )
         }
@@ -130,24 +132,55 @@ fun DriveLogListItem(
                 text = driveTime.date
             )
             Spacer(modifier = Modifier.height(16.dp))
-            DriveTimeWithIcon(
+            DriveTimeRowWithIcon(
                 icon = R.drawable.sun,
-                text =
-                    pluralStringResource(R.plurals.hours, driveTime.dayHours.toInt(), driveTime.dayHours.toInt())  + " " +
-                    pluralStringResource(R.plurals.minutes, driveTime.dayMinutes.toInt(), driveTime.dayMinutes.toInt())
+                hours = driveTime.dayHours.toInt(),
+                minutes = driveTime.dayMinutes.toInt()
             )
             Spacer(modifier = Modifier.height(8.dp))
-            DriveTimeWithIcon(
+            DriveTimeRowWithIcon(
                 icon = R.drawable.moon,
-                text =  pluralStringResource(R.plurals.hours, driveTime.nightHours.toInt(), driveTime.nightHours.toInt())  + " " +
-                        pluralStringResource(R.plurals.minutes, driveTime.nightMinutes.toInt(), driveTime.nightMinutes.toInt())
+                hours = driveTime.nightHours.toInt(),
+                minutes =  driveTime.nightMinutes.toInt()
             )
         }
     }
 }
 
 @Composable
-fun DriveTimeWithIcon(@DrawableRes icon: Int, text: String) {
+fun DriveTimeSummaryWithIcon(@DrawableRes icon: Int, text: String) {
+    Row {
+        Image(
+            modifier = Modifier.width(24.dp).height(24.dp),
+            painter = painterResource(icon),
+            contentDescription = null
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text = text)
+    }
+}
+
+@Composable
+fun DriveTimeRowWithIcon(@DrawableRes icon: Int, hours: Int, minutes: Int) {
+    if (hours == 0 && minutes == 0) return
+
+    val hoursText = if (hours > 0) pluralStringResource(R.plurals.hours, hours, hours) else ""
+    val minutesText = if (minutes > 0) pluralStringResource(R.plurals.minutes, minutes, minutes) else ""
+
+    val text = remember(hours, minutes, hoursText, minutesText) {
+        buildString {
+            if (hours > 0) {
+                append(hoursText)
+                if (minutes > 0) {
+                    append(" ")
+                }
+            }
+            if (minutes > 0) {
+                append(minutesText)
+            }
+        }
+    }
+
     Row {
         Image(
             modifier = Modifier.width(24.dp).height(24.dp),
