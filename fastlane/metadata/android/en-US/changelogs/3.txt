@@ -1,0 +1,4 @@
+Add icon
+Add screenshots
+Add changelog
+Fix issue that allowed the logging of zero time. 
